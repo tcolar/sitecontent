@@ -1,0 +1,45 @@
+======Scaling Rivet&Sway======
+One of the first thing I had to deal with after joining [[rivet_and_sway | Rivet & Sway]] was dealing with scaling and up-time issues of the site.
+
+The whole site was built on Drupal and hosted on Pantheon, a Drupal, PAAS provider.
+I could go on and on on how Drupal and PHP are abominations that should never be used, especially for E-commerce but I'll spare you.
+
+**Anyway here are some of the issues I had to deal with right away:**
+
+  - The site was very slow, most pages would take at least 10 seconds to pull up.
+  - The site was down often and the support was poor despite paying 1K a month in "enterprise support"
+  - The site did not scale well at all, 30 concurrent visitors could slow it to a crawl (yes THIRTY !)
+
+**There where a variety of reasons for all this:**
+
+  - PHP &  Drupal are just extremely inefficient no matter what everybody tells you, 100's of SQL queries and lots of CPU to pull up a page is the norm.
+  - Pantheon is / was a young company (spring 2013) still finding themselves and reinventing too much.
+  - The company E-commerce needs are actually quite complex and definitely not a good fit for Drupal.
+  - The existing code base was not very efficient and the content was very heavy, many pages where over 1MB.
+
+=====What we did about it=====
+
+My ideal solution would be let's replace that big piece of ... technical debt ... and re-implement it properly with a proper platform.
+But obviously being at a start-up with only a few employees you can't just go and invest in that when there are deadline to meet, also it needed to be fixed now, not in 6 months, so I laid out a plan with several steps:
+
+==== Step1 - Better hosting ====
+[[scaling_drupal_hosting | Moving off Pantheon]] 
+The downtime on Pantheon was very unreasonable, the service was not professional and worst of all there was nothing we could do but to wait for them to fix issues while we waited. It was also quite costly and the performance was not that impressive. (Visit [[scaling_drupal_hosting | Moving off Pantheon]] for more details on the alternatives we tested)
+
+==== Step2 - New setup on AWS ====
+[[Setting up Drupal on AWS]] 
+Once AWS was picked as the new host, it was time to set that up and move over, first without performance enhancements, see the nest step for that.
+
+==== Step3 - Scaling Drupal====
+[[Scaling Drupal]]
+Once we Had reliable hosting, the next step was to do our best to make it scallable (many many steps to this).
+
+==== Step4 - Software life cycle tools ====
+[[Drupal Software lifecycle tools]]
+
+Create our own software life cycle & developer workflow tools (Git, deploy, backup etc....)
+
+=====End result architecture=====
+{{nrs_network.png}}
+
+

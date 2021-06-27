@@ -1,0 +1,24 @@
+======Rivet & Sway======
+
+In April 2013 I joined [[http://rivetandsway.com | Rivet & Sway]], a cool young startup trying to disrupt the eye-ware <del>market</del> monopoly.
+
+{{rs/layer_cake.jpg}}
+
+- [[Why a startup again]] ?
+- [[why_rivet_and_sway | Why Rivet & Sway]] ?
+
+=====What Am I working on=====
+I am going to blog into much more details about all this soon, once I find the time.
+
+Here are some things I had to work on so far:
+  - [[scaling_rivet_sway | Making Rivet & Sway scale]] One of the first thing I had to do was to make the existing E-commerce site scale and be reliable. 
+  - Researching, specifying and implementing a new platform (Replace Drupal with Go)
+  - Mobile optimization.
+  - New Point Of Sale(in store) E-commerce solution, developed very quickly with Go + Revel & Zurb Fundation4.
+  - Lightweight reporting & Analytics server leveraging Go and Morris.js
+  - Implemented a new [[rivet_and_sway_style_finder | Style finder]] service based on **Go/Martini** with a bit of big data / learning thrown in leveraging **MySql** and the **InfluxDb** time series database. 
+  - Researched alternatives to using Dropbox in the company setting
+  - Operational enhancements: As our order volume is growing rapidly it became important to optimize operations (Order processing, Shipping, EDI, inventory).
+  - [[http://wiki.colar.net/drupal_software_lifecycle_tools|Developer workflow tools]] to make it easy to deploy code and manage server caches and such.
+
+

@@ -1,0 +1,17 @@
+{"author":"Guest",
+"title":"I get the following error.I want to add Not Valid and In_Progress in Status options. But get @21@ and @26@ in my options list. ",
+"text":"Here is what I did so far..\r\n I edited config_inc.php and added \r\n\r\n $g_status_enum_string = '10:new,20:feedback,21:Not Valid,26:In_Progress,30:acknowledged,50:assigned,80:resolved,90:closed'; $g_status_colors['Not Valid'] = '#ACE7AE'; $g_status_colors['In_Progress'] = '#CEF9CF';\r\n\r\n Then I created custom_constant_inc.php \r\n\r\n <?php\r\n define( 'Not Valid', 21 );\r\n define( 'In_Progress', 26 );\r\n ?> \r\n\r\n\r\n Then I created custom_strings_inc.php\r\n  \r\n <?php $s_status_enum_string = '10:new,20:feedback,21:Not Valid,26:In_Progress,30:acknowledged,50:assigned,80:resolved,90:closed'; ?>",
+"ts":"2015-07-10T15:27:07.009-04:00 New_York",
+"date":"10 Jul 2015 15:27 EDT"}
+{"author":"Guest (Guest)",
+"title":"cannot see the custom files in my mantis dir",
+"text":"Hi,\nI need to add a new status value in mantis and followed the above given procedure, but i cannot see those custom files in my mantis/gui directory. could u ppl pls help\n\nThanks in Advance :)",
+"ts":"2009-07-31T00:21:00-07:00 Los_Angeles"}
+{"author":"vignesh (Guest)",
+"title":"My 2 cents.",
+"text":"can we change the current statuses available to some other name? like acknowledge to open?\n",
+"ts":"2009-07-01T03:50:00-07:00 Los_Angeles"}
+{"author":"Guest (Guest)",
+"title":"My 2 cents.",
+"text":"Thanks, this was really helpful.\n",
+"ts":"2009-06-18T08:42:00-07:00 Los_Angeles"}

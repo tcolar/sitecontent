@@ -1,0 +1,79 @@
+====== Scaling Drupal - Hosting ======
+Note: This is just one part of the [[scaling_rivet_sway | Scaling Rivet&Sway]] process.
+
+
+When I first Joint Rivet&Sway the site (based on Drupal) was very slow and unreliable.
+
+A big part of the problem was the PAAS we used, Pantheon, it was just very slow and down often.
+Despite paying a lot for "enterprise support", the service was juts too unreliable.
+ 
+See the bottom of the page if you want my take on Pantheon but for now let's constinue on subject about finding a replacement host fr our Drupal site.
+
+My first inclination was to try another PAAS, because you now, if somebody else can take the responsibilities of system admin away from me, I'm all for it.
+
+====Pass on the PASS====
+Unfortunately none of the PAAS I tested where a better alternatives:
+
+  - **Dotcloud** and **AppFrog** pretty much didn't work wth our large Drupal site(700MB) or where too slow to use (worst than Pantheon)
+
+  - **Heroku** : Made it difficult to install Drupal and cost was unnatrcative
+
+  - **Cloudfoundry** : That actually looked quite good and promising but unfortunately was still in beta (spring 2013)
+
+  - **Openshift** : Works the best and I really liked how they did things, very transparent, very much how I would do it (a.k.a low on weird magic). Unfortunately was in alpha at the time.
+
+In any case none of those provided a better option than Pantheon. 
+Matter of the fact is that PAAS are much better tailored to smaller applications, especially lighter ones or those made with an efficient language or framework. Drupal does not fit that at all (huge slow dog basically).
+
+====On to VPS options====
+So since a PAAS wasn't an option it was back to the old reliable approach, a VPS server.
+
+Obviously a bit more work needs to be down, you "own" the OS and platform, on the other hand you gain full control and visibility.
+
+Also we need to use/implement our own software lifecycle tool chain, but again it's not that hard using git and friends and also gives more control and transparency.
+
+I tested a variety of VPS, starting with Linode, which I've used for years and always has been phenomenal.
+
+Tested VPS solutions:
+
+  - **Linode** : Linode worked great and the site runs way faster on it
+20$ month, 24BG disk space, 1 GB memory, 1/8 cpu, 2TB transfer
+
+  - **Digital Ocean** : Digital Ocean is even a little bit faster, probably because they use SSD drives
+20$ month, 40GB SD, 2GB memory, 2 cores cpu, 3TB transfer
+
+  - **Amazon AWS (EC2)**: 
+45$/month, 160GB, 1.7GB memory, 1 core cpu, 20BG EBS, Transfer EXTRA -> 150$ / TB
+
+====Load test results====
+I tested all those options with jmeter load tests as well as some cloud based load testing solutions
+
+Here are some of the average response time for my given load test:
+
+  - **Pantheon dev** : 7.2 seconds (Nginx)
+  - **Pantheon live**: 5.94 seconds (Optimized with Nginx, Redis, Varnish etc...)
+  - **OpenShift** : 4.1 seconds (vanilla Apache+Drupal stack)
+  - **Linode** : 2.2 seconds (vanilla Apache+Drupal install)
+  - **Digital Ocean** : 2.1 seconds (vanilla Apache+Drupal install)
+  - **AWS(small) + local Mysql** : 3.4 second  (vanilla Apache+Drupal install)
+  - **AWS(small) + RDS db** : 2.51 seconds  (vanilla Apache+Drupal install)
+
+Also it's important to note that Pantheon gave errors sooner under high load than the VPS solutions.
+ 
+So anyway while the best bang for the buck would have been digital Ocean, I decided to go with AWS because of all the other tools it offers (I ended up using, EC2, RDS, S3, Route53 and more)
+
+====Pantheon thoughts====
+I do think the guys behind Pantheon are quite smart, probably some of the smartest in the Drupal community (whatever that mean), on the other hand there are many things that bother me about Pantheon:
+
+  - Customer service: While they have "customer excellence engineers" and such, in reality the service juts wasn't great even with "platinum support". When things went down communication was poor and the support was quite amateurish.
+  - No difference between free, paid or enterprise customer. You all share the same "server matrix". Technically that sounds nice but in practice paid customer should get better service. 
+
+  - Too complex a system: There are any videos online explaining all the intricacies of the hardware setup but bottom line it's very complex, there are so many parts including things such as a custom grown file system (really??) that it's just bound to fail in one place or another which is what was happenening regularly (22 "incidents" in April). For example see: [[https://www.getpantheon.com/blog/how-pantheon-content-base-works]] 
+
+  - The solution to performance issues with Drupal is apparently always more layers of caches, Varnish and Nginx on the web layer, APC on the app server layer, Redis on the DB layer and so on. All that is more things that can go wrong and dealing with caches and invalidation is a nightmare on it's own (What's even the "advantage" of a CMS then?). Also all those caches are just a way of acknowledging that for Drupal to scale you should basically not use it.
+
+The concept is basically one giant matrix of server and services shared by everyone, obviously it makes sense costwise as far as Pantheon is concerned but personally as a consumer I would rather not "pay" for all those extra layers and complexity I don't need. That is juts more potential points of failure and technical debt.
+
+Their goal is to make Drupal scallable and well they sure picked something challenging. In my opinion it's a lot of energy wasted trying to make such a poorly designed platform scale(PHP/Drupal), why not just use and promote well architected platforms in the first place  rather than trying to polish ... this.
+ 
+

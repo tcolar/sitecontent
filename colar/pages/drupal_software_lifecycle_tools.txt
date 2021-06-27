@@ -1,0 +1,228 @@
+======Drupal Software lifecycle tools======
+Note: This is just one part of the [[scaling_rivet_sway | Scaling Rivet&Sway]] process.
+
+
+After we moved off Pantheon (PAAS) one thing we where left without was the "software lifecycle" tooling, such as source code management, deploy tool and the likes.
+On the other hand the new tools are more flexible.
+
+Really All that's actually needed is a bit of automation on top of git, scp, rsync, possibly drush and a bit of SQL.
+
+I haven't opensourced this because I' no sure it's all that reusable since it grew organically as more needs become apparent, nevertheless it was built very quickly, a few days.
+
+=====Platform=====
+I decided to use Go(golang) for this project as I wanted something lean and simple, definitely not Drupal, and I've started the process to migrate to Go for most new developement and rewrites.
+
+If also used the Revel framework, this is a "heavier" framework than I usually like, but it got all I needed, in particular it's built-in job module was very useful here to kick off various tasks (via bash, SQL and so on). Seriously Go+Revel makes this easier than anything else.
+
+There a few pages based on twitter Bootstrap, with buttons to do various tasks.
+Most tasks run as a job and then when they complete you get the output (ajax).
+
+The concept is a "deployment server", from which we can fetch code from git (Latest version or specific) and deploy it to the test or live servers. There are also other features to flush caches, restart services and so on.
+
+Using bash scripts feels a little lame, but on the other hand they have the advantage to be completely decoupled from the "front-end" and so can be easily used/tested standalone.
+
+====Features====
+Here are some of the features provided:
+
+  - **Checkout code** Button (can specify a git version hash, blank for latest)
+This juts calls out to a bash script
+<code>
+#!/bin/bash
+
+# Checkout a specific revision of the Drupal source base.
+# By default check out the latest.
+
+# Vars
+TO_DIR="[REMOVED]"
+DRUPAL_PRJ_GIT="[REMOVED]"
+DRUPAL_PRJ_NAME="[REMOVED]"
+
+# Main
+revision=$1
+
+# default is to get master
+if [ "$revision" == "" ] ; then
+  revision="master"
+fi
+
+# clone repo if first time ever
+if [ ! -d "${TO_DIR}/${DRUPAL_PRJ_NAME}" ] ; then
+  cd "$TO_DIR"
+  git clone "$DRUPAL_PRJ_GIT"
+fi
+
+cd "${TO_DIR}/$DRUPAL_PRJ_NAME"
+
+# Always pull latest first
+git pull
+
+# Then checkout requested revision
+#git checkout $revision
+
+echo "--------"
+echo "Now at revision: "
+git log -n 1
+
+# Recursively check for files with bad encoding
+# Will list any bad files found ... I had that happen and it's a NASTY bug to figure out
+# Drupal would just give a white page .....
+# So I now check the files before any deploy to avoid this ever happening again
+echo "--------"
+echo "Checking files encoding: "
+
+for f in $(find "${TO_DIR}/$DRUPAL_PRJ_NAME" -name '*.php' -or -name '*.html'  -or -name '*.txt')
+do
+  iconv  -o /tmp/iconv.out "$f" || echo "Bad enconding in $f"
+done
+rm /tmp/iconv.out
+
+echo "--------"
+echo "Fixing Files Users & Permissions: "
+sudo chown -R www-data:ubuntu .
+sudo chmod -R 755 .
+
+echo "--------"
+echo "Done !"
+</code> 
+
+  - **Button to check what revision the deploy server currently has**
+<code>
+#!/bin/bash
+
+# Show current checked out version of drupal project
+
+# Vars
+TO_DIR="[REMOVED]"
+DRUPAL_PRJ_NAME="[REMOVED]"
+
+# Display latest git commit version & log message
+cd "${TO_DIR}/$DRUPAL_PRJ_NAME"
+git log -n 1
+</code>
+
+  - **Button to deploy to the various servers (test, live etc..)**
+Deploy all the "code"(in Drupal, it's one big ugly mix of code/content)
+I use rsync to copy only what changed as it's much faster & efficient than using a git c/o again.
+
+<code>
+#!/bin/bash
+SSL_KEY="[[REMOVED]].pem"
+
+#main
+to_host=$1
+eval `ssh-agent`
+ssh-add "$SSL_KEY"
+
+cd "$TO_DIR"
+rsync -rav -p --chmod=a+rwx,g+rwx,o-wx \
+  --rsync-path="sudo rsync" \
+  --exclude ".git" \
+  --exclude "sites/default/files/" \
+  "${DRUPAL_PRJ_NAME}/" "${USER}@${to_host}:/dupal/path/"
+</code>
+
+  - **Button to clear Drupal content caches**
+This is a leaner alternatives to clearing all drupal caches
+
+<code>
+#!/bin/bash
+echo "Flushing Mysql cache tables"
+mysql -A -u${db_user} -h${host} -p${pass} ${db_name} < ./scripts/flush_caches.sql
+
+# Flush redis cache
+echo "Flushing Redis cache"
+ssh ${user}@${to_host} redis-cli FLUSHALL
+</code>
+
+With the scripts/flush_caches.sql looking like this:
+We also have a few extra custom caching table not listed here.
+<code>
+delete from cache_page;
+delete from cache_advagg;
+delete from cache_advagg_bundle_reuse;
+delete from cache_advagg_css_compress_inline;
+delete from cache_advagg_files_data;
+delete from cache_advagg_js_compress_file;
+delete from cache_advagg_js_compress_inline;
+delete from cache_block;
+delete from cache_content;
+delete from cache_filter;
+delete from cache_form;
+delete from cache_rules;
+delete from cache_update;
+delete from cache_views;
+delete from cache_views_data;
+delete from cache_mollom;
+</code> 
+
+  - **Buttons to Flush all Drupal caches**
+We rarely use this as that has a heavy performance it.
+This is the equivalent of "clear all caches" under Drupal performance page
+
+<code>
+ssh ${USER}@${to_host} drush cc all
+</code>
+
+  - **Buttons to restart all services**
+This uses ssh to connect to a given server and restart drupal related services
+Only used in case of serious issues, yet still much better than a reboot.
+<code>
+ssh ${USER}@${to_host} sudo service nginx stop
+ssh ${USER}@${to_host} sudo service php5-fpm stop
+ssh ${USER}@${to_host} sudo service redis-server stop
+ssh ${USER}@${to_host} sudo service redis-server start
+ssh ${USER}@${to_host} sudo service php5-fpm start
+ssh ${USER}@${to_host} sudo service nginx start
+</code>
+
+  - **Buttons to create database dumps of the Test and Live Drupal databases** (for backup or copy) but stripping out all real customer data (users, orders and so on) as well as "useless" data (caches etc...).  
+This simply calls out to a shell script (that can be used separately)
+<code>
+#!/bin/bash
+# schema
+mysqldump --single-transaction --extended-insert --no-data\
+  -h${host} -uadmin -p${pass} test_drupal\
+  > public/dumps/$filename
+
+# tables, minus caches, orders, users
+mysqldump --single-transaction --extended-insert --no-create-info -h${host} -uadmin\
+ -p${pass} --ignore-table=test_drupal.advagg_bundles --ignore-table=test_drupal.advagg_files\
+ --ignore-table=test_drupal.cache --ignore-table=test_drupal.cache_advagg --ignore-table=test_drupal.cache_advagg_bundle_reuse\
+ --ignore-table=test_drupal.cache_advagg_css_compress_inline --ignore-table=test_drupal.cache_advagg_files_data\
+ --ignore-table=test_drupal.cache_advagg_js_compress_file --ignore-table=test_drupal.cache_advagg_js_compress_inline\
+ --ignore-table=test_drupal.cache_apachesolr --ignore-table=test_drupal.cache_block --ignore-table=test_drupal.cache_content\
+ --ignore-table=test_drupal.cache_filter --ignore-table=test_drupal.cache_form --ignore-table=test_drupal.cache_menu\
+ --ignore-table=test_drupal.cache_mollom --ignore-table=test_drupal.cache_page --ignore-table=test_drupal.cache_rules\
+ --ignore-table=test_drupal.cache_update --ignore-table=test_drupal.cache_views --ignore-table=test_drupal.cache_views_data\
+ --ignore-table=test_drupal.rivet_cache --ignore-table=test_drupal.users --ignore-table=test_drupal.uc_orders\
+ --ignore-table=test_drupal.variable test_drupal\
+  >> public/dumps/$filename
+
+# variables table minus some settings we want to not overwrite
+mysqldump --single-transaction --replace --extended-insert --no-create-info -h${host}\
+  -uadmin -p${pass}\
+  --where="name !='drupal_private_key' AND name !='file_directory_temp' AND name !='googleanalytics_account' AND name !='mailchimp_api_key' AND name !='mandrill_analytics_domains' AND name !='mandrill_api_key' AND name !='mandrill_status' AND name !='securepages_basepath' AND name !='securepages_basepath_ssl' AND name !='uc_authnet_aim_txn_mode' AND name !='uc_authnet_api_live_gateway_url' AND name !='uc_authnet_api_login_id' AND name !='uc_authnet_api_test_gateway_url' AND name !='uc_authnet_api_transaction_key' AND name !='uc_payment_credit_gateway' AND name !='uc_pg_authorizenet_cc_txn_type' AND name !='uc_pg_test_gateway_cc_txn_type'" drupal variable\
+  >> public/dumps/$filename
+
+# Add a few testing seed users / orders
+cat scripts/seed_data.sql >> public/dumps/$filename
+
+# tar gzip it
+cd public/dumps/
+tar czvf ${filename}.tgz $filename
+rm $filename
+
+cd ../..
+
+echo "Done ! -> Created public/dumps/${filename}.tgz"
+</code>
+
+  - We have a few other tasks like running  EDI jobs and such
+
+=====Conclusion=====
+In any case this gives us nice deployment server with a simple interface from which we can manage the code and services on the web heads.
+
+At this point it work better that what Pantheon was offering, in particular deploys are much faster as it's a simple rsync instead of the full git checkout they where using, which where slow with our large project.
+
+{{gosway.png}}
+

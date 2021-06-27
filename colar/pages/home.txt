@@ -1,0 +1,24 @@
+====Home====
+Hello there, my name is **Thibaut Colar**.
+
+I'm a sarcastic coder, architect & tech lead, in whichever order is needed. 
+
+My interests are software, start-ups, building things, playing and watching hockey and good food.
+
+I currently work at Glympse where I'm replatforming a high volume .NET monolith to a fleet of Go microservices. 
+Go has been my primary language for over 4 years and I love it.
+
+Here you will find:
+  * [[My Blog]]
+  Where I talk about many things, mostly related to **software development** and the **start-up** life.
+
+  * [[My Software]]
+  Find out about all the **open-source software I've written** and links to my code repos.
+
+  * [[My Projects]]
+  The things I've built over the years, such as a **camping trailer, an arcade, a standing desk** and more.
+
+  * [[About me]]
+  Here you will find more info about me and my family, as well as my **contact info and resume**.
+  Your one stop shop to add me to your spam database !
+

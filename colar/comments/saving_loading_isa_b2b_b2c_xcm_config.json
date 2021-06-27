@@ -1,0 +1,10 @@
+{"author":"David",
+"title":"Restart Application in NW 7.3",
+"text":" - Go to the SAP NetWeaver Administrator (http://127.0.0.1:50000/nwa)\r\n - \"Configuration\" > \"Infrastructure\" > \"Application modules\"\r\n - Search for the Name of the Application (e.g. shopadmin)\r\n - Select the Application and click \"More Actions\" > \"View corresponding to Application\"\r\n - And eventually click \"Restart\"",
+"ts":"2013-12-03T03:33:58.606-05:00 New_York",
+"date":"03 Dec 2013 3:33 EST"}
+{"author":"Chandu",
+"title":"Restart the application",
+"text":"How to restart the applications (b2b/user admin/ shop) in SAP Net weaver 7.3. I know how to restart applications in 7.0.",
+"ts":"2013-07-30T17:09:51.51-04:00 New_York",
+"date":"30 Jul 2013 17:9 EDT"}

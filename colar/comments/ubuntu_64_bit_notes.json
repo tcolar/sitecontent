@@ -1,0 +1,5 @@
+{"author":"Diane Mercier",
+"title":"Your recipe works for install Yoono on Ubuntu 13.04",
+"text":"I repeated your recipe to install and run Yoono with Ubuntu 13.04 (64bit).\r\n1) download: http://djlab.com/stuff/getlibs-all.deb\r\n2) sudo dpkg -i getlibs all.deb\r\n3) download yoono-desktop and unzip \r\n4) skip (Because do not say 32bit package): sudo dpkg-i - force-all some_app.deb\r\n5) sudo getlibs ./yoono-desktop\r\n6) make a launcher (manage launcher)\r\n7) run: ./yoono-desktop\r\n\r\nRegards",
+"ts":"2013-08-27T22:31:55.438-04:00 New_York",
+"date":"27 Aug 2013 22:31 EDT"}

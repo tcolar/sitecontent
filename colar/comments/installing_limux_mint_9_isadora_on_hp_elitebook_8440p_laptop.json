@@ -1,0 +1,14 @@
+{"author":"NVEsp",
+"title":"My 2 cents",
+"text":"lol except i have to reboot everytime i close the lid or else the screen just stays black n doesnt come back. im pretty sure the system is still running tho cause i can hear a sound from ctrl alt del but thats how it was when it would go black at the desktop after booting before lol.",
+"ts":"2019-05-19T18:42:30.997-04:00 New_York",
+"date":"19 May 2019 18:42 EDT"}
+{"author":"NVEsp",
+"title":"My 2 cents",
+"text":"I use ubuntu mate LTS and I have to do this fix on my 8440p to get it to boot or else once it gets to desktop the screen just stays black. Installing and everything from usb went fine originally i didn't run into problems until i got to the desktop. It would show up for 1 second and then go black. I just had to change the grub config for some reason and my model doesn't even have the nvidia card it's just the base model with onboard intel graphics.",
+"ts":"2019-05-19T17:15:46.094-04:00 New_York",
+"date":"19 May 2019 17:15 EDT"}
+{"author":"tommygb2@gmail.com (Guest)",
+"title":"Mint 12 on Elitebook 8440P",
+"text":"Hello,\nHave you been successful at installing Linux Mint 12 on your \nHP Elitebook 8440P? I have but not able to use it with second monitor and that is a game stopper for me. Just wondering. Your fixes/help for Mint 9 were great and work wonderfully. Any help would be much appreciated for Mint 12.\nTom",
+"ts":"2012-02-14T11:41:00-08:00 Los_Angeles"}

@@ -1,0 +1,35 @@
+====== About Me ======
+Hello there, my name is Thibaut Colar, sarcastic coder, architect & tech lead, in whichever order is needed. 
+
+I grew up in a very tiny village in France but after college I <del>moved</del> **escaped** to The SF bay area(1998) where all the interesting geek stuff was happening, I was in the bubble before and during implosion.
+
+Since 2005 I've lived in the Seattle area with my wife and 2 children.
+
+My interests are software, start-ups, building things, playing and watching hockey.
+
+I am a true End to End dev, I've worked with many of the latest OSS projects as well as massive solutions such as SAP CRM. I love to be the jack of all trades, but I take my trade seriously, I want to craft things that last and scale.
+
+I currently work at a start-up called **[[http://igneous.io/|Igneous Systems]]** in downtown Seattle.
+
+In the past I have worked for [[http://www.qarbon.com|Qarbon.com]], [[http://www.pacificcoast.com|Pacific Coast Feather]], [[http://www.teachscape.com|Teachscape]] and [[Rivet&Sway]]
+
+I also had my own consulting company for a while [[http://www.status302.com | Status302 LLC]]
+
+====Contact Info and Resume====
+Here are my contact info:
+  * Email : [[mailto:tcolar@colar.net]]
+  * Twitter: [[http://twitter.com/tcolar/]]
+  * Linked in: [[http://www.linkedin.com/in/tcolar]]
+  * **Github** :[[http://github.com/tcolar/]] 
+
+Here is **[[http://www.status302.com/thibaut_colar_resume|My Resume]]** (Linked-in is often more up-to-date)
+
+See also [[My Software]], [[My Projects]] and [[http://status302.com/]] for more info on what I've worked on over the years.
+
+====Family & Hobbies====
+  * Our Family photos:
+[[http://www.colar.net/photos/]]
+
+  * The Hockey teams in play in:
+[[Hockey Teams]]
+

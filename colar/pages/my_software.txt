@@ -1,0 +1,117 @@
+======My Software======
+**Here you will find my open-source projects**
+
+  * My code Repositories
+  - [[http://github.com/tcolar/]]
+  - [[http://bitbucket.org/tcolar/]] (Not as up to date as github)
+  - [[http://bitbucket.org/status302/]]
+
+Here I'm describing some of my open source projects.
+
+That does not in include most of the code I write at work, which is currently mostly in [[http://wiki.colar.net/_tag?tag=golang|Go]] @ [[rivet_and_sway|Rivet&Sway]] and some [[http://wiki.colar.net/_tag?tag=drupal|PHP]] only when i'm coerced by force into it :) 
+
+In the past most of my work code was mostly in [[http://wiki.colar.net/_tag?tag=fantom|Fantom]] and many many iterations of [[http://wiki.colar.net/_tag?tag=java|Java]]. From Applets and AWT from 1997 all the way to gigantic J2EE projects more recently. 
+
+=====Current Software=====
+I write in several languages, "best tool for the job" is really my school of thought.
+However my languages of choice are currently **GO** or **Fantom**.
+In the more distant past I mostly used **Java** and sometimes **Python**.
+
+====Go libraries====
+
+  - [[https://github.com/tcolar/gollections]] - Implemented "Generic" List/Map collections in Go with nice list comprehension features(.each and such). I'm not using it much, was more of an exercise.
+
+I've been writing a ton of go code at work, basically rewriting everything we use to do in Drupal as well as a lot of operation and analytics type tools but most of that stuff is not open source, however i did open source some bits such as:
+
+  - [[https://github.com/tcolar/authorize]], minimal Authorize.net support for Go.
+  - [[https://github.com/tcolar/ups]], minimal UPS tracking API's support for Go.
+  - [[https://github.com/tcolar/fedex]], minimal Fedex tracking API's support for Go.
+  - [[https://github.com/tcolar/drupalcrypto]], support for Drupal6 weird built-in crypto in Go.
+  - [[https://github.com/tcolar/phpserializer]], support for serializing/deserializing PHP from Go, cause you know drupal stores serialized PHP in the database O_0 !!  
+
+====Fantom Presentation====
+[[https://github.com/tcolar/fantompres]]
+Slides and examples for the talk(s) I've given about the Fantom language.
+
+====RaspberryTart (Python)====
+[[https://github.com/tcolar/raspberrytart]]
+
+A small Pandora music server & interface I hacked up in a few hours and threw on a raspberry Pi at Rivet&Sway
+We use it to play the office music and it's also hooked to a TV to show various live metrics (separate project).
+
+====Camembert Code editor (Fantom)====
+[[http://www.status302.com/camembert | Camembert lightweight IDE]] is a Free, Open source, lightweight Editor, written in Fantom. It's multi-platform and can run on many platforms (Linux, Max, Windows...)
+It support multiple project types such as Go, Fantom, Maven, Python, Ruby, Nodejs, Axon and is a useful all around lightweight editor / IDE.
+
+====FantoRepo (Fantom)====
+[[http://repo.status302.com/]]
+This s the central repository for Fantom projects (Sorta the NPM of Fantom).
+
+Code here : [[https://github.com/tcolar/fantorepo302]]
+
+====Fantomato Wiki Engine (Fantom)====
+[[https://bitbucket.org/tcolar/fantomato/src|Fantomato]] 
+Fantomato is a wiki/site/blog engine written in Fantom.
+It has many features including rendering pages in Markdown, Dokuwiki or HTML syntax.
+The site you are currently looking at is running on it.
+It is a partial port/rewrite of my previous Java blog engine called [[http://www.jotwiki.net/home|jotwiki]] which was implemented in java.
+
+====MameChose M.A.M.E frontend (Fantom) ====
+[[http://wiki.colar.net/mamechose|MameChose]] is a Mame(Arcade game emulator) frontend.
+It allows quick indexing / searching / launching of an arcade game collection(roms).
+It is dsigned to have a simple but effective interface that is used only with a joystick and a few buttons.
+The interface is also designed to scale so it can work as well on all arcade monitors(<320x260) as on latest LCD's with a high resolution.
+
+Code: [[https://github.com/tcolar/mamechose]]
+
+====Kid stuff====
+[[https://github.com/tcolar/kids]]
+Stuff I write either with or for the kids.
+Math game such as this 1998 styled beauty :) : [[http://colar.net/kids/mathpage/math.html]]
+And other javascript experimentation and such.
+Maybe a bit of Lego Mindstrom stuff as well, you get the idea.
+
+====AWS Backup (Python)====
+[[https://github.com/tcolar/awsbackup]]
+Some helper scripts I wrote to more easily manage backups EC2 instances on AWS.
+Creates snapshot, copy the to a remote region and keep a specific number of backups and so on.
+
+====Fantom IDE====
+[[http://fantomide.colar.net/]]
+Code: [[https://github.com/tcolar/fantomidemodule/blob/master/src/net/colar/netbeans/fan/parboiled/FantomParser.java]]
+IDE for the Fantom language based on Netbeans (Both as a plugin and a standalone IDE based on the RCP platform)
+
+I no longer actively maintain this but it does contain some of the most complex OSS code I've worked on.
+Writing Lexer and Parsers that can recover from broken code (as it's being typed) is some pretty tricky business.
+Also code completion, refactoring, and such features with a fairly complex language such as Fantom is non trivial (Inference, closures, dynamic calls and such make it complex.)
+
+=====Older Software=====
+**The following projects are older and no longer actively maintained.**
+
+====Berry4All====
+[[http://www.berry4all.com/home|Berry4All / BBTether]]
+An easy to use program for tethering(use as a modem) a blackberry under linux, written in python / WxPython.
+That probably was my most popular OSS projects with thousands of monthly downloads at it's peak.
+I rarely code in Pyhton and this code is a bit hacky by definition (reverse engineering) so the code is so-so in places.
+Code: [[https://bitbucket.org/tcolar/berry4all]]
+
+====SAP on Tomcat====
+[[https://bitbucket.org/tcolar/saptomcat|Sap Tomcat]]
+Sap Tomcat is a bunch of work I did to allow to run the SAP B2B and B2C java applications
+on a much lighter opensource stack of Tomcat or Jetty + MySql or H2 .
+The standrad SAP web server can be extremely frustrating for development as it's extremely slow to redeploy an application.
+This allowed greatly enhanced developer productivity as well as used of standard tooling (IDE, debuggers, profilers and so on).
+
+====JavaOnTracks====
+[[http://www.javaontracks.net/Home|JavaOnTracks]]
+A java Framework/Toolbox with tons of functionalities.
+
+====JotWiki====
+[[http://www.jotwiki.net/Home|JotWiki]]
+A Wiki based on the JavaOntracks framework.
+This site <del>is</del> was running on jotwiki.
+
+====Gp2X====
+[[GP2X]]
+Some software i wrote for the GP2X device: virtual touchscreen keyboard (python)
+

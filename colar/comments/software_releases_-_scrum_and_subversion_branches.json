@@ -1,0 +1,9 @@
+{"author":"Guest",
+"title":"More questions",
+"text":"- What if several features are developed in parallel within its own branches, when to merge them?\r\n- How to minimize merge conflicts?\r\n- Wouldn't is be good to define sync points at sprint ends, and try to avoid feature definition that take longer then the sprint duration by splitting them up into smaller feature chunks?\r\n- What about QA, how can a scrum based SVN strategy support reducing idle times while the code is being tested?",
+"ts":"2016-01-20T11:07:37.336-05:00 New_York",
+"date":"20 Jan 2016 11:7 EST"}
+{"author":"Guest (Guest)",
+"title":"Thanks for the quick overview",
+"text":"Thanks! This was a helpful starting point for learning about branching strategies.\n",
+"ts":"2010-06-29T08:39:00-07:00 Los_Angeles"}

@@ -1,0 +1,26 @@
+{"author":"Another Guest",
+"title":"My 1 cent",
+"text":"What should I write (what directory to show) in the window \"Option\" for Fantom Home. After installing NetBeans and Fantom, and after restarting Netbeans I couldn't find 'config.props' anywhere on my disks. This windows (\"Options\") appears each time after I launch NetBeans (7.4) (with delay of a few seconds). :(",
+"ts":"2013-11-04T14:46:01.791-05:00 New_York",
+"date":"04 Nov 2013 14:46 EST"}
+{"author":"Guest",
+"title":"Will there be support of NB7.3",
+"text":"Hi!\r\nHas anyone tested NB7.3 so far? Would be glad if fantom and NB7.3 do work properly.\r\n\r\nThx.",
+"ts":"2013-02-22T10:33:01.834-05:00 New_York",
+"date":"22 Feb 2013 10:33 EST"}
+{"author":"Guest (Guest)",
+"title":"My 2 cents.",
+"text":"we have a problem when we want to run a program because it doesn't run it keeps thinking\nthanks!",
+"ts":"2012-03-15T07:35:00-07:00 Los_Angeles"}
+{"author":"Guest (Guest)",
+"title":"Minor typos",
+"text":"While \"Follow the wizzrad\" and \"officla\" are entertaining :-) you might want to fix those typos.  Thanks!\n",
+"ts":"2010-12-04T11:51:00-08:00 Los_Angeles"}
+{"author":"Guest (Guest)",
+"title":"My 2 cents.",
+"text":"I'm not seeing Fantom in the update centre.  I had to add the source as you instructed here.\n",
+"ts":"2010-09-08T09:43:00-07:00 Los_Angeles"}
+{"author":"rmuller (Guest)",
+"title":"Questions about fantom plugin",
+"text":"First of all: thanks for your efforts, i am using the plugin for several days now and it works great. However i have a few questions about missing features:\n1) Auto indent is not working. Is this a bug or missing feature?\n2) It would be great to be able to run fantom tests from NB, just like the Java ones (ctrl-f6)\n3) Is a file type Fantom test planned? (create -> new -> Fantom test. Then the test file is created from a template and stored in the test directory)\n\nRegards,\n\nRonald",
+"ts":"2010-08-16T14:31:00-07:00 Los_Angeles"}

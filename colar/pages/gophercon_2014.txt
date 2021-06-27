@@ -1,0 +1,50 @@
+======Gophercon 2014 in Denver======
+
+I'm very pleased to have been to that conference and it was a great one.
+
+I did enjoy the single track approach and almost all the speakers where good so it went very smoothly.
+
+====The crowd====
+I really liked the attendees in general. It was a very smart crowd with many founders and very knowledgeable developers.
+I think because of the language features Go attracts people that are experienced and value things like maintainability, readability and performance. People who like things that are well designed and have a pragmatic approach.
+
+Most people where involved with more back-end & dev-ops roles and I that's just my kind of crowd :)
+
+It was great to be able to chat with some pillars of the Go community.
+
+====The Go Team====
+I think the Go team itself really needs to be praised (Robert Griesemer, Rob Pike, Andrew Gerrand, Brad Fitzpatrick, Russ cox).
+
+They where so humble and accessible and I really believe that set the tone for the conference.
+
+There they where at the pub crawl a midnight, middling with the crowd.
+
+Then on Saturday, during the hack day, after the conference was over, there was Rob Pike, seating at the next table, hacking with the Gobot team, how cool is that !
+
+{{gophercon-rob-pike-gobot.jpg}}
+
+It was also very interesting to see the very different backgrounds and personalities of the Go team. I think because of this every decision is dissected and really thought through, which leads to quality decisions.
+
+They however do all seem to favor simplicity and pragmatism and that's music to my hears.
+
+====The organizers====  
+Let's not forget them, they made this happen and it was obviously not a simple task.
+Kudos to them, I think it's not common for a first conference to go this smoothly.
+
+====Go-ing forward====
+It's amazing how much Go has grown just in the past year.
+
+I'm confident it will become a top ten language shortly(1 or 2 years ?) and eventually make the top 5.
+
+Go reminds me very much of Java when it first came out, before you say that's insulting remember Java 1.0:
+  - It was very simple and readable compared to the alternatives at the time.
+  - It was Free, eventually Open source(-ish) but pushed by a large company. (Go does better here of course)
+  - It made concurrency and networking much simpler.
+  - Many people thought it was limited and not very powerful looking. Things you hear about Go from people that don't get the point.
+
+Some of the java issues now that I'm thinking won't happen to Go:
+  - Performance: Obviously the JVM is a well oiled machine now, but Java was a beast for 5 to 10 years, Go is way ahead already.
+  - Bloat (a.k.a "enterprise"). It's very clear the Go team is strongly against any of that, I doubt there will be a Go-EE under this team watch :) 
+
+I'm even more bullish and excited about Go's future now !
+

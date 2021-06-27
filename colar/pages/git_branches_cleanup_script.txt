@@ -1,0 +1,36 @@
+# Git Branches Cleanup Script
+
+Now that I work at a larger start-up with many devs I often have many active git branches.
+
+The workflow is the common local -> push to my fork -> Pull request -> merge to master.
+
+While I try to do housekeeping it's not uncommon for branches to be abandoned or such. 
+
+After a while I end-up with lots of "dead" branches, also branches that get merged into master also
+don't get removed automatically, so anyway I made a small script to facilitate cleanup when I feel like it.
+
+<code>
+#!/bin/bash
+set -e
+
+git checkout master
+git fetch --prune  # this makes sure local and origin branches are in sync
+
+# remove all already merged branches (local & remote)
+git branch --merged | grep -v master | xargs -r git branch -d
+git branch -r --merged | grep -v master | sed -e 's/origin\//:/' | xargs -r git push origin
+
+# Ask about un-merged branches (so can remove them if obsolete)
+branches=`git branch | grep -v master`
+for b in $branches; do 
+read -p "Delete $b locally and on remote ? y/N" -n 1 -r answer
+echo
+if [[ $answer == "y" ]]; then
+echo "Deleting $b"
+git branch -D $b
+set +e
+git push origin :$b
+set -e
+fi
+done
+</code>

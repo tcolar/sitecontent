@@ -1,0 +1,42 @@
+====Recent Blog entries:====
+ 
+  * [[vh_footwear_hockey_skates | VH Footwear Hockey Skates]]
+
+  * [[Git branches cleanup script]]
+
+  * [[gophercon_2014 | My Thoughts about Gophercon 2014]]
+
+  * [[revel_newelic | Hooking up Go Revel with Newrelic]]
+
+  * [[golang | My detailed thoughts about Go, so far]]
+
+  *[[hockey_in_the_seattle_area | Adult Hockey in the Seattle area]]
+
+  * [[scaling_rivet_sway|Scaling the Rivet&amp;Sway site]]
+
+  * [[camembert_golang | Enhanced Go support in Camembert]]
+
+  * [[French Baguette Recipe]]
+
+  * [[why_rivet_and_sway | Why I joined Rivet &amp; Sway]]
+
+  * [[golang_revel_init_script | Upstart init script for Go / Revel apps]]
+
+  * [[classic_arcade | Classic Arcade cabinet and front-end I built]]
+
+  * [[why_a_startup_again | Why I want to work for a start-up once again]]
+
+  * [[Ikea standing Desk]] I built
+
+  * [[acer_v3_551g_x419_ubuntu | Acer V3 551G X419 under Ubuntu]]
+
+  * [[camembert | The camembert lightweight IDE]]
+
+  * [[Generic init script for Fantom based server processes]]
+
+  * [[Ubuntu 12.04 on Samsung series 7 Chronos laptop]]
+
+  * [[Camping Trailer]] I Built
+
+  * [[beautiful_fonts_in_java | Beautiful fonts in Java apps]]
+

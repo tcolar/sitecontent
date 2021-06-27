@@ -1,0 +1,5 @@
+{"author":"Guest",
+"title":"A little different",
+"text":"Thanks, though initGorelic should be called with revel.OnAppStart(initGorelic), here's a little changes i'v made to read values off of the config file ( revel.Config.String(\"newrelic.license_key\") )\r\n\r\nEverything running but still no data on the dashboard...\r\n",
+"ts":"2014-12-28T19:34:31.02-05:00 New_York",
+"date":"28 Dec 2014 19:34 EST"}

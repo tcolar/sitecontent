@@ -1,0 +1,125 @@
+======Setting up Drupal on AWS======
+Note: This is just one part of the [[scaling_rivet_sway | Scaling Rivet&Sway]] process.
+
+
+====Setting up the RDS MySql database====
+While using RDS to host the Drupal database is optional, it's highly recommended compared to hosting it directly in an EC2 instance. For one it's managed, optimized, more scallable and provide many built-in features.
+
+See the [[Setting up the Drupal database on Amazon RDS]] page for that.
+
+====Installing Drupal on an EC2 instance====
+Note that you should probably use at least a "small" instances as micro instances do not provide the (huge) level of IO/CPU required by Drupal.
+
+After you setup a proper EC2 instance with ssh keys and so on you will be ready to start the installation
+Also configure correctly /etc/hostname and /etc/hosts as needed
+
+====Setting up Drupal 6====
+Note: I am using an RDS instance for MySql, the following instructions will also install a local MySql instance, however we will not use it and disable it.
+
+
+<code>
+// Note: this will pull Drupal, Apache, MySql
+sudo apt-get install drupal6
+// important : Some drupal modules leverage curl, so best to install it now.
+sudo apt-get install php5-curl
+// I install git as well since I use it for code deployments
+sudo apt-get install git
+</code>
+
+Since we won't use the local MySql instance, let's turn it off to make sure we won't accidentally use it:
+<code>
+sudo -s
+echo 'manual' > /etc/init/mysqld.override
+service mysql stop
+exit
+</code>
+
+Create a proper Apache config file, for example a very minimal example:
+<code | drupal.conf>
+<VirtualHost *:80>
+        ServerName your.host.com
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/drupal/
+        <Directory /var/www/drupal>
+        Options +Indexes FollowSymLinks +ExecCGI
+        AllowOverride All
+        allow from all
+        </Directory>
+</VirtualHost>
+</code>
+
+And then enable it and run it:
+<code>
+sudo cp drupal.conf /etc/apache2/sites-available/drupal.conf
+cd /etc/apache2/sites-enabled
+sudo ln -s ../sites-available/drupal.conf .
+</code>
+
+If you need SSL, you will want to set that up too
+<code>
+sudo a2enmod ssl
+sudo mkdir /etc/apache2/ssl
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt
+//Also need to activate mod_rewrite or much won't work
+sudo a2enmod rewrite
+</code>
+
+Now we can remove the default apache file and restart apache:
+<code>
+cd /etc/apache2/sites-enabled
+sudo rm 000-default
+sudo service apache2 restart
+</code> 
+
+At this point you should be able to access drupal (/install.php /update.php etc...)
+
+In case of errors you can get better logging by editing the .htaccess file of drupal
+<code | vi .htaccess>
+php_flag log_errors on
+php_value error_log /tmp/PHP_errors.log
+</code>
+
+Taking about setting.php. install.php, update.php etc..., once itw ork don't forget to secure them (set permissions so they can't be used)
+
+====Enabing APC==== 
+Without APC performance is very very poor so it's just about a ust have.
+By default PHP is parsing / interpreting all pages for every request, this is incredibly resource intensive and slow, APC solves this as it cache interpreted pages.
+
+<code | Setting up APC>
+sudo apt-get install php-apc
+vi /etc/php5/conf.d/20-apc.ini 
+</code>
+<code | /etc/php5/conf.d/20-apc.ini>
+extension=apc.so
+apc.shm_size=128M
+apc.enabled=1
+apc.shm_segments=1
+apc.ttl=43200
+</code>
+<code>
+sudo service apache2 restart
+</code>
+
+====Mail service====
+Amazon only allows sending email via SES although you can send a few without but not many.
+Note tat you ave to request permission to use SES and also to email from an instance which could take a few days (in my case was juts a few hours).
+
+Installed postfix and configured to use AMAZON SES, see: [[http://docs.aws.amazon.com/ses/latest/DeveloperGuide/postfix.html]]
+
+<code>
+sudo apt-get install postfix
+sudo apt-get install php-pear
+sudo pear install mail
+sudo pear install Net_SMTP
+sudo pear install Auth_SASL
+sudo pear install mail_mime
+sudo service apache2 reload
+</code>
+
+Amazon SES gets (very) unhappy if you send a lot of emails that bounces, so for this reason we need to make the local mail (root etc..) go to a deliverable address:
+<code | sudo vi /etc/aliases>
+postmaster:    you@gmail.com
+root:    you@gmail.com
+ubuntu:    you@gmail.com
+</code> 
+

@@ -1,0 +1,96 @@
+<!-- Example template (not very pretty but documented) -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+      <!-- Note the variables: title, genratedDate. They will be filled in by the wiki -->
+      <title>{{title}}</title>
+      <meta name="date" content='{{generatedDate}}' />
+      <meta name="keywords" content='{{title}}, {{keywords}}'/>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <meta name="robots" content="index,follow" />
+
+      <!-- Note that all template resources should be fetched like this (tpl/*)-->
+      <link rel='stylesheet' type='text/css' href='/tpl/bootstrap.min.css' />
+      <link rel='stylesheet' type='text/css' href='/tpl/standard.css' />
+
+      <!-- You might want to include your extra custom css here -->
+      <link rel='stylesheet' type='text/css' href='/tpl/template.css' />
+
+      <!-- highlight.js -->
+      <link rel="stylesheet" href="/tpl/dark.css">
+      <script src="/tpl/highlight.pack.js"></script>
+
+      <script type="text/javascript" src="/tpl/jquery.min.js"></script>
+      <script type="text/javascript" src="/tpl/template.js"></script>
+ </head>
+  <body>
+  <div>
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container-fluid">
+            <a class="brand" href="#">Fantomato</a>
+            <div class="nav-collapse">
+                <ul class="nav">
+                  <!-- #ap will call a wiki lambda that will add "class='active'" if the path matches the arg-->
+                  <li {{#ap}}page1{{/ap}}><a href="page1">Page1(.md)</a></li>
+                  <li {{#ap}}page2{{/ap}}><a href="page2">Page2(.txt)</a></li>
+                  <li {{#ap}}page3{{/ap}}><a href="page3">Page3(.html)</a></li>
+              </ul>
+           </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="container-fluid" style="margin-top:60px">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="well">
+              <!-- Example of importing a subpage-->
+              {{#import}}
+                sub
+              {{/import}}
+          </div>
+        </div>
+        <div class="span9">
+          <div class="content">
+             <!-- The page content, Note the use of '&' so the content does not get HTML escaped-->
+              {{ & content }}
+
+              {{#commentsEnabled}}
+              <hr/>
+              <!-- Comments -->
+                <div class="well comments">
+                <h2> Comments </h2>
+                  <a id="addCommentLink" href='#'>Add a new Comment</a>
+                  <div id="addCommentPane" style="display: none">
+                    <form id="addCommentForm" class="form-horizontal">
+                      <div class="control-group"><label class="control-label" >Title:</label><div class="controls"><input class="span9" type="text" name="title" value="My 2 cents"></div></div>
+                      <div class="control-group"><label class="control-label" >Author:</label><div class="controls"><input class="span9" type="text"  name="author" value="Guest"></div></div>
+                      <div class="control-group"><label class="control-label" >Text:</label><div class="controls"><textArea class="span9" rows="6" name="text"></textArea></div></div>
+                      <div class="control-group"><div class="controls"><img class="span5" id="captchca" src=""/><input type="text" name="captcha" class="span4" placeHolder="Enter captchca code (4 alphanum)"></div></div>
+                      <div class="control-group"><div class="controls"><button type="submit" class="btn">Submit</button></div></div>
+                    </form>
+                  </div>
+                <div id="comments">
+                  <!-- comments will be filled in by ajax / jquery, see template.js-->
+                </div>
+              </div>
+              <!-- End comments -->
+              {{/commentsEnabled}}
+
+          </div>
+        </div>
+      </div>
+    </div>
+        <footer>
+            <p>{{ & footer}}</p>
+        </footer>
+  </div>
+
+  <!-- scripts -->
+  {{ & googleAnalytics}}
+
+  </body>
+</html>
+

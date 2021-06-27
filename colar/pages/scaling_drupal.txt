@@ -1,0 +1,416 @@
+======Scaling Drupal======
+Note: This is just one part of the [[scaling_rivet_sway | Scaling Rivet&Sway]] process.
+
+The first step was to install the **APC**, it's such a must have that I had that covered in the [[Setting up Drupal on AWS]] page.
+
+After that more steps where taken to improve performance further, load tests where done after each change to measure performance, you will find those at the bottom of the page.
+
+=====Redis database cache=====
+Drupal is extremely database heavy, among other things it caches generated html pages in some database tables, of course pages are large so it's not very efficient.
+
+Redis allows us to cache all that data in memory, which is way way faster than having to query a remote database.
+While it's not safe or practical to cache everything from Drupal in Redis, all the caches can be and should. 
+Redis is pretty smart too, so there is not much need to deal with clearing caches, it sort of behaves simply like a drop-in proxy in front of the underlying DB.
+
+Redi also allows backing up the cached data to fie so that it can be reloaded into memory after a restart, That has a huge benefit with Drupal because Drupal perform very poorly with a "cold" cache after a restart and it can take upward of 10 minutes to improve (which can very tough cause issue restarting under high load). 
+
+So first I installed the Predis module (Php/Redis module) of the right version:
+
+<code>
+cd /usr/share/drupal/sites/all/modules/
+wget "http://ftp.drupal.org/files/projects/redis-7.x.tar.gz"
+tar xzvf redis-7.x.tar.gz
+cd /usr/share/drupal/sites/all/libraries/
+wget https://github.com/nrk/predis/archive/v0.7.x.tar.gz
+tar xzvf v0.7.x.tar.gz
+</code> 
+Then added to settings.php to have Predis handle the drupal caches
+
+<code | setting.php>
+$conf['cache_inc'] = 'sites/all/modules/cache_backport/cache.inc';
+define('PREDIS_BASE_PATH', '/usr/share/sites/all/libraries/predis-0.7.x/lib/');
+$conf['redis_client_interface']  = 'Predis';
+$conf['cache_backends'][] = 'sites/all/modules/redis/redis.autoload.inc';
+$conf['cache_default_class'] = 'Redis_Cache';
+# Do NOT cache cache_form in redis -> causes issues, leave that one to be handled by the standard Drupal cache
+$conf['cache_class_cache_form'] = 'DrupalDatabaseCache';
+</code>
+Install Redis:
+
+<code>
+sudo apt-get install redis-server
+echo 1 > /proc/sys/vm/overcommit_memory
+sysctl vm.overcommit_memory=1
+</code>
+Setup the max memory in /etc/redis/redis.conf ''maxmemory 200mb''
+Then restart Redis:
+''sudo service redis-server restart''
+
+We can check redis like this:
+<code>
+redis-cli
+> KEYS *
+> INFO
+</code>
+You also can setup a small monitoring page for redis, such as: 
+[[https://gist.github.com/blongden/2050845]]
+
+=====Nginx + Php-Fpm=====
+Apache+mod_php gets easily overwhelmed under high load especially since mod_php has to bootstrap php for all requests.
+Also since Nginx being asynchronous it handles traffic spikes much better (I've tested this theory and it's no contest).
+
+Note: I also tried Fastcgi instead of Php-Fpm, I can't say there was a clear winner as they had different strength and weaknesses in my load tests. Php-Fpm is a bit simpler to install an possibly more stable.
+
+
+At first I tried to have Nginx in front of Apache to serve static content only and pass the rest to Apache but the gain was not as much as expected, so it's juts simpler to have Nginx handle everything.
+
+Nginx can offer caching and other features a reverse proxy like varnish can, yet it's simpler and has less drawbacks in my opinion (one less software to deal with and Varnish has the huge drawback of supporting http only, not https.)
+
+First I turned off apache and disabled it from running at start-up, we would not want it to start and bind to the http port !
+<code>
+service apache2 stop
+sudo update-rc.d -f apache2 remove
+</code>
+
+Then I installed php-fpm and nginx
+<code>
+sudo apt-get install nginx php5-fpm
+</code>
+
+Then I configured php-fpm to listen on port 9000 (/etc/php5/fpm/pool.d/www.conf)
+Note that some versions of Ubuntu have different behavior, listening to a socket instead.
+
+Here is what mine looks like
+<code | /etc/php5/fpm/pool.d/www.conf>
+[www]
+user = www-data
+group = www-data
+listen = 127.0.0.1:9000
+pm = dynamic
+pm.max_children = 2000
+pm.start_servers = 10
+pm.min_spare_servers = 5
+pm.max_spare_servers = 20
+pm.status_path = /status.php
+chdir = /
+</code>
+
+You might also want to adjust the timeout in /etc/init.d/php5-fpm. ie: ''TIMEOUT=300''
+
+If using APC, you will want to copy the settings:
+<code>
+sudo cp /etc/php5/conf.d/20-apc.ini /etc/php5/fpm/conf.d/20-apc.ini
+</code>
+
+There should also be /etc/php5/fpm/php.ini file, you might want to tweak some settings there, for example
+<code>
+upload_max_filesize = 25M
+post_max_size = 25M
+memory_limit = 356M
+max_execution_time = 300
+max_input_time = 300
+error_log = /tmp/php-errors.log
+</code>
+
+Start php-fpm:
+<code>
+sudo service php5-fpm restart
+</code>
+
+Then setup Nginx:
+<code>
+cd /etc/nginx/ 
+vi sites-available/yoursite.conf
+</code>
+<code | Example nginx conf>
+
+##### Microcacing - optional ######
+# 900MB max microcache, evict items if unused for 10mn
+fastcgi_cache_path /var/cache/nginx/fastcgi_temp levels=1:2 keys_zone=MYAPP:900m inactive=10m;
+# if downsteam server is down, serve cached content in interim
+fastcgi_cache_use_stale error timeout invalid_header http_500;
+fastcgi_ignore_headers Cache-Control Expires Set-Cookie;
+###### End Microcaching ############
+
+server {
+        server_name localhost;
+        root /usr/share/drupal; ## <-- Your only path reference.
+ 
+        listen              80;
+
+index index.html index.htm index.php;
+
+        gzip_static on;
+ 
+        location = /favicon.ico {
+                log_not_found off;
+                access_log off;
+        }
+ 
+        location = /robots.txt {
+                allow all;
+                log_not_found off;
+                access_log off;
+        }
+ 
+# Prevent user from accessing settings.php directly
+location ~ ^/sites/[^/]+/settings.php$ {
+deny all;
+}
+
+location ~* ^(?:.+\.(?:htaccess|make|txt|log|engine|inc|info|install|module|profile|po|sh|.*sql|theme|tpl(?:\.php)?|xtmpl)|code-style\.pl|/Entries.*|/Repository|/Root|/Tag|/Template)$ {
+allow 127.0.0.1;
+                deny all;
+}
+
+location ~ \..*/.*\.php$ {
+return 403;
+}
+
+        # No no for private
+        location ~ ^/sites/.*/private/ {
+                return 403;
+        }
+ 
+        location ~ (^|/)\. {
+                return 403;
+        }
+        
+# Use an SSH tunnel to access those pages. They shouldn't be visible to
+# external peeping eyes.
+location = /install.php {
+allow 127.0.0.1;
+deny all;
+}
+
+location = /update.php {
+allow 127.0.0.1;
+deny all;
+}
+
+ 
+        location / {
+                try_files $uri @rewrite;
+        }
+ 
+        location @rewrite {
+                rewrite ^/(.*)$ /index.php?q=$1;
+        }
+ 
+        location ~ \.php$ {
+                fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                include fastcgi_params;
+                fastcgi_param SCRIPT_FILENAME $request_filename;
+                fastcgi_intercept_errors on;
+
+fastcgi_param PHP_VALUE "memory_limit=300M";
+fastcgi_param PHP_VALUE "max_execution_time=259200";
+fastcgi_param PHP_VALUE "error_log=/tmp/PHP_errors.log";
+fastcgi_param PHP_VALUE "max_input_vars=3000";
+fastcgi_param PHP_VALUE "suhosin.get.max_vars=3000";
+fastcgi_param PHP_VALUE "suhosin.post.max_vars=3000";
+fastcgi_param PHP_VALUE "suhosin.request.max_vars=3000";
+
+
+##### Microcacing - optional ######
+    # Setup var defaults
+    set $no_cache "0";
+    # If non GET/HEAD, don't cache and mark user as uncacheable for 1 second via cookie
+    if ($request_method !~ ^(GET|HEAD)$) {
+      set $no_cache "1";
+    }
+    # Drop no cache cookie if need be
+    # (for some reason, add_header fails if included in prior if-block)
+    if ($no_cache = "1") {
+      add_header Set-Cookie "_mcnc=1; Max-Age=2; Path=/";
+      add_header X-Microcachable "0";
+    }
+    # Bypass cache if no-cache cookie is set
+    if ($http_cookie ~* "_mcnc") {
+      set $no_cache "1";
+    }
+    # Bypass cache if flag is set
+    fastcgi_no_cache $no_cache;
+
+    fastcgi_cache_bypass $no_cache;fastcgi_cache_key "$scheme$request_method$host$request_uri";
+    fastcgi_cache MYAPP;
+    #microcaches for up to a few mn to handle sudden spikes
+    fastcgi_cache_valid 200 301 302 304 5m;
+    fastcgi_cache_use_stale error timeout invalid_header;
+    fastcgi_pass_header "X-Accel-Expires";
+##### End microcaching ############
+
+fastcgi_read_timeout 600s;
+                fastcgi_pass 127.0.0.1:9000;
+        }
+ 
+                 location ~ ^/sites/.*/files/imagecache/ {
+                try_files $uri @rewrite;
+        }
+
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|woff)$ {
+                expires max;
+                log_not_found off;
+        }
+}
+</conf>
+</code>
+
+Then enable the new config and restart Nginx:
+<code>
+cd /etc/nginx/ 
+sudo ln -s ../sites-available/yoursite.conf .
+sudo service nginx restart
+</code>
+
+At this point you are a pretty optimized Drupal base that ca scale pretty well, vertically at least.
+
+====Shared File system====
+One roadblock to scaling Drupal horizontally is the fact it stores some files/content in the local file system(Uploaded files).
+Obviously that's problematic as we don't want multiple webheads which each their own independent file system.
+
+The answer is to use a shared file system, some options are:
+  - A **NFS share**: Problem is that it creates another single point of failure
+  - **GlusterFs** : While that sounds like a good option it's a much more complex solution than I wish for.
+  - There are other options, see a [[https://www.getpantheon.com/news/inside-pantheon-valhalla-filesystem|Good article from Pantheon on this]].
+
+In my case I ended-up using Amazon S3 in part because I was already on an Amazon infrastructure.
+There are advantages to S3:
+  - Very reliable & redundant
+  - More or less no scaling limit
+  - Very affordable
+  - There are good tools to use / access it
+  - Can easily leverage Amazon CDN later if needed.
+
+But there are also some serious drawbacks to consider:
+  - While it's reliable it can also be slow (high latency)
+  - It's HTTP based so while read and writes are fairly fast forget doing any sort of search.
+  - Everything is stored together, there is no real concept of directories internally.
+
+So anyway what I did is create an S3 bucket and mount it locally, WITH A LOCAL CACHE, that part is very important because of the potential, albeit rare, high latency issues S3 can have.
+
+WARNING: It's very important to realize the trade-offs of S3. For example we had once script that would search/iterate a folder for files to process, on S3 that was so slow as to be unusable. That code was modified so it knew individual files paths rather than having to search. Forget about using tools such as ''find'' or ''grep'' against an S3 file system, although you can run them on the cached copy of course.
+
+
+====Create the S3 backed file storage====
+First you will want to create an S3 bucket, this explains this well:
+[[http://www.whiteboardcoder.com/2012/11/reading-s3-via-s3fs-from-ubuntu-1204.html]]
+
+Then install s3fs
+WARNING: Be very careful that there are two different software called s3fs and you want to be sure you have the right one. Also the ubuntu repos had a very obsolete version !
+
+
+So I installed s3fs from source to make sure it was the correct and recent version. 
+<code>
+sudo apt-get install build-essential libfuse-dev fuse-utils libcurl4-openssl-dev libxml2-dev mime-support
+cd
+wget https://s3fs.googlecode.com/files/s3fs-1.71.tar.gz
+tar xzvf s3fs-1.71.tar.gz
+cd s3fs-1.71
+./configure
+make
+sudo make install
+</code>
+
+Create the /etc/passwd-s3fs an save the S3 Bucket IAM key and password in it (again refer to [[http://www.whiteboardcoder.com/2012/11/reading-s3-via-s3fs-from-ubuntu-1204.html|this link]])
+<code>
+sudo vi /etc/passwd-s3fs
+// Save the key and passwrod in there separated by a colon (key:password)
+sudo chmod 640 /etc/passwd-s3fs
+</code>
+The I created the drupal file folder (where we will mount the S3 bucket)
+As well as a location for the local cache (here /data/s3_cache)
+<code>
+sudo mkdir /usr/share/drupal/sites/default/files/
+sudo mkdir /data/s3_cache
+sudo chown www-data:ubuntu /usr/share/drupal/sites/default/files/
+sudo chown www-data:ubuntu /data/s3_cache/
+</code>
+
+Then we will want to set that share to be automatically mounted, with the cache activated
+<code | sudo vi /etc/fstab>
+s3fs#rivetandsway-web-test /usr/share/drupal/sites/default/files fuse allow_other,_netdev,uid=33,gid=33,use_cache=/data/s3_cache/ 0 0
+</code>
+
+Now we can mount it and use it
+<code>
+sudo mount /usr/share/drupal/sites/default/files
+</code>
+
+====End result====
+At that point it's possible to scale horizontally.
+
+Even better I was able to create an image (AMI) from this webhead and then be able to juts launch more instances either manually or on demand, behind a load balancer, making for a much more reliable and scalable site.
+Another benefit is that it makes it easy to take instance in and out say for maintenance with very little impct on the customers.  
+
+While it might seem counter intuitive that each instance would have it's own Redis and APC caches, it's actually beneficial in my opinion:
+  - It makes each instance mostly standalone (other than the Db and S3 connections) 
+  - If one APC or Redis was to fail on one instance it does not affect the others
+  - It allows for packaging an image "As is" and juts starting it and adding it to the ad balancer to scale.
+
+All instances are exactly the same with the one lone exception that I consider one the master because it's the only one that runs cron jobs (I rather not have cron job ran from multiple instances).
+
+{{nrs_network.png}}  
+
+====Further enhancements====
+If yet more performance is needed we could cache all content behind either **Varnish or Nginx**.
+
+I would actually probably use Nginx as this doesn't add yet another new element to the mix.
+
+Also when we where on Pantheon it had Varnish and I didn't like the experience, it could only can HTTP and not HTTPS adding a lot of complications. Also this layer of caching made for some very tricky bugs that one persn might get and not another plus the usual pains of cache invalidation.
+
+Another thing to explore is **using a CDN** such as cloudfront for most static content, in particular to store the mostly "static" content such as images and so on. This is something I might revisit later as this would offload the load on the Drupal server. But then again it adds another layer of cache invalidation issues. For example it an take time for changes to propagate over the CDN edge servers this can potentially cause inconsistent results while it's ongoing.
+
+An even much better thing to explore would be to replace Drupal / PHP with something efficient and well designed.
+
+====Instance types====
+Our Test system runs on a simple "small" instance
+
+Our live system use C1 medium instances as in my test I found Drupal was more CPU than memory hungry and so it did better with such an instance (only 1.7GB of memory but 5 processing units).
+
+We could do with smaller instances for sure, but t's nice to have some room to handle spikes.
+A different strategy would be more instances of a smaller type but then you have more instances to deal with and keep in sync so it's a trade-of. YMMV.
+
+====Load Tests====
+My load tests where all ran against a single "small" EC2 instance.
+
+I tested both with a custom jmeter test as well as with a "cycling" loader.io cloud based test (cycles more and more users sending queries as fast as they can).
+
+===Stock Drupal (Apache)===
+Jmeter: Performance started degrading very fast ~ 24 users(~3 minutes) This would map to a theoretical max of 480 active users / hour or 11.500 / day (Yikes !)
+
+Loader.io scaled to only 35 cycling users before getting errors
+
+===Drupal + Apache + APC===
+Performance started degrading quickly passed ~ 60 users(~3 minutes) This would map to a theoretical max of 1200 active users / hour or 28.000 / day
+
+Loader.io scaled to 65 cycling users before getting errors
+
+Note that under high load right after a restart or cache clear (ie: nothing is cached) it performs very very poorly and can be easily overwhelmed with as little as 20 concurrent users while it's starting (Redis solves this issue).
+
+===Drupal + Apache + APC + Redis===
+Performance started degrading quickly passed ~ 170 users(~3 minutes) This would map to a theoretical max of 3400 active users / hour or 84k / day
+
+Loader.io scaled to 120 cycling users before getting errors
+
+===Drupal + Apache + APC + redis + Nginx===
+Nginx in front of Apache for static files.
+
+Performance started degrading quickly passed ~ 180 users(~3 minutes) This would map to a theoretical max of 3600 active users / hour or 86k / day
+
+Loader.io scaled to 150 cycling users before getting errors
+
+===Drupal + APC + redis + Nginx + Php-Fpm=== 
+Removed Apache and Nginx serves all.
+
+Performance started degrading passed ~ 180 users(~3 minutes) however unlike with Apache it kept working, just more slowly.
+
+Loader.io scaled to the full 200 cycling users without errors with all requests under 4 seconds, the only setup that completed without errors.
+
+
+Note: I still find those results quite pathetic, it speaks a lot about how inefficient a platform Drupal is. I wrote some system as far back as 2001, in 'slow' Java mind you, on a single pentium server that could handle 10-100 times this.
+
+
+
+ 
+

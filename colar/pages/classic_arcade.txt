@@ -1,0 +1,18 @@
+======Classic Arcade======
+
+This page is not very detailed and I also lost most of the build pictures, but here are a few:
+
+I also built my own Mame frontend, see [[mamechose]]
+
+{{arcade1.jpg}}
+
+{{arcade2.jpg}}
+
+{{arcade4.jpg}}
+
+{{arcade5.jpg}}
+
+{{arcade6.jpg}}
+
+{{arcade7.jpg}}
+

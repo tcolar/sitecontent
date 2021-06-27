@@ -1,0 +1,38 @@
+======Setting up The Drupal database on Amazon RDS======
+Note: This is just one part of the [[scaling_rivet_sway | Scaling Rivet&Sway]] process.
+
+
+First you want to create an RDS instance with Mysql and the proper EC2 security group so your EC2 instances can access it (and possibly access IP's depending whether you use VPC or not)
+For example: 
+  - Go to RDS console / security groups / "Create Db security group"
+  - Choose "EC2 Security Group" and assign the security group used for the web servers.
+  - Then make sure your RDS DB is set to use that security group. (Modify)
+
+TIP: To create & import an existing Drupal database from a specific machine outside of EC2, you can go to:
+RDS console / security groups / default and allow your CRID/IP (temporarily).
+
+
+Now we should be able to connect to RDS and create the drupal DB:
+<code>
+mysql -h mysql.host.com -u admuser -p
+> GRANT ALL PRIVILEGES ON drupal.* TO drupal@'%' IDENTIFIED BY 'yourpassword';
+> exit
+</code>
+Now we are ready to import existing Drupal data in it (assuming you made a dump with mysqldump):
+<code>
+mysql -h mysql.host.com -u admuser -p drupal < your_drupal_dump.sql
+</code>
+I did get errors at first, such as:
+<code>
+"ERROR 2006 (HY000) at line XXX: MySQL server has gone away"
+</code>
+
+The solution to that is to create a custom parameter group in the RDS console (Default one is read only)
+  - Go in the RDS web console and then to "DB parameter groups"
+  - Then "Create DB parameter group"
+  - Search for "**max_allowed_packet**" and click "edit parameters" and set the value to 64000000 (~64MB) for example.
+  - Also set "**wait_timeout**" to 1000 and "**interactive_timeout**" to 1000 (seconds).
+  - Finally go to go the database instance and right click and select "Modify" then change the DB security group to the custom one we juts created.
+  - Reboot the DB (might not be required)
+
+After making those changes I was able to import the Drupal dump without issues.

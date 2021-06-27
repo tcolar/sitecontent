@@ -1,0 +1,17 @@
+======[[My Blog & Tips]]======
+Here you will find my thought/docs/tips on stuffs:
+
+  * [[Geek Blog]]
+An assortment of HOWTO's & arguments about software related subjects, mostly Go, Fantom, Java, Linux etc...
+
+  * [[rivet_and_sway | Rivet & Sway]]
+Blogging about the start-up life and E-commerce & technology choices and implementation I'm making at Rivet&Sway.
+
+  * [[Fan | Fantom Blog]]
+HOWTO's and info on using Fantom & Skyspark (2008-2013)
+
+  * [[SAP Tips]]
+Many SAP HOWTO's and documentation I wrote from 2005 to 2011 about SAP/Java (CRM5.0 ISA B2C B2B TREX etc...)
+
+
+

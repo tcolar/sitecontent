@@ -1,0 +1,32 @@
+======Rivet & Sway - Style finder======
+
+The style finder is a recommendation engine that we developed at [[rivet_and_sway | Rivet&Sway]] to help our customers select the right products and thus increase conversion. It has a built-in product recommendation algorithm with some basic machine learning based on user events/behavior looping back into it.
+  
+It's live here: 
+[[http://rivetandsway.com/style-finder/]]
+
+====Technology====
+While much of the Rivet&Sway is still, sadly,  based on Drupal the style finder was written in Go from scratch because we wanted something fast, modern and mobile friendly (responsive) which are all hard to accomplish with Drupal.
+
+Here is the style finder software stack:
+
+  - [[http://golang.org/|Go]] 
+  - [[http://martini.codegangsta.io/|Martini]] as a lightweight server framework.
+  - [[https://github.com/eaigner/jet/|Jet]] as a very lightweight (My)SQL to Go mapper.
+  - [[http://foundation.zurb.com/|Zurb Foundation 5]] has a good mobile first responsive web framework. 
+  - Various fancy Jquery plugins of course.
+  - [[http://influxdb.org/|InfluxDb]] : InfluxDb is a time series database written in Go.
+
+Quite a bit of tedious data mapping had to be done to use the Drupal database from Go and that's where Jet was handy.
+
+InfluxDb was used for some machine learning functionality, I would create events in InfluxDb according to the users behavior. For example say they decided they didn't want a suggested product or say they decided to do a home-try-on for ones, I would create time base events that would later be leveraged to enhance the product recommendation algorithm.
+
+We also have some simple reporting dashboards to analyse the data which is in InfluxDb. (Using Morris.js to render graphs). See [[rivet_and_sway_reporting|Rivet&sway - Reporting]] 
+
+====End result====
+The style finder has proven quite successful at it's main goal which is improving purchase conversion, in particular o mobile devices.
+
+It's also much much faster than any of the Drupal pages where, about 5ms per page rather than 500ms for Drupal, that helps with bounce rates.
+
+{{style-finder.jpeg}}
+

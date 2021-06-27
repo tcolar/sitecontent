@@ -1,0 +1,27 @@
+
+.sidebar-nav
+{
+    padding: 9px 0;
+}
+.comments
+{
+  background-color:#eeeeff
+}
+
+/*@media (max-width: 979px) {
+  body {
+    padding-top: 0px;
+  }
+}*/
+/*@media (max-width: 500px){
+
+    #phonerow .span3 {
+        display: none;
+    }
+
+    #phonerow .span9 {
+        float: none;
+        width: auto;
+    }
+}*/
+

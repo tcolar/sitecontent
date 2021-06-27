@@ -1,0 +1,74 @@
+======Hooking up golang Revel with Newrelic======
+
+There is a go client for newrelic called [[https://github.com/yvasiyarov/gorelic|GoRelic]]
+
+So that's pretty easy to hookup with any go app.
+
+However it was just a little bit trickier to hook up the Http metrics part with Revel.
+That is because Revel does not really offer an way (AFAIK) to directly wrap the handler such as:
+<code>
+http.HandleFunc("/", agent.WrapHTTPHandlerFunc(handler))
+</code> 
+
+Besides I want to monitor all requests, so anyway here is how I hook it up.
+
+<code | init.go of the revel app>
+package app
+
+import (
+  "log"
+  "time"
+
+  "github.com/robfig/revel"
+  "github.com/yvasiyarov/go-metrics"
+  "github.com/yvasiyarov/gorelic"
+)
+
+// Need to keep a variable for the gerelic agent
+var agent *gorelic.Agent
+
+func init() {
+
+  initGorelic()
+
+  revel.Filters = []revel.Filter{
+    gorelicFilter, // We add a custom filter
+   // ... all the other revel filters
+  }
+
+}
+
+// initGorelic Initializes the Gorelic agent
+func initGorelic() {
+
+  // Note I load NEWRELIC_LICENSE from a  config file not shown here. Only start gorelic if a license id resent.
+  if len(NEWRELIC_LICENSE) > 0 {
+    log.Print("Starting newrelic daemon.")
+    agent = gorelic.NewAgent()
+    agent.NewrelicLicense = NEWRELIC_LICENSE
+    agent.NewrelicName = "YourAppName"
+    agent.NewrelicPollInterval = 180
+    agent.Verbose = true
+
+    // "Manually" init the http timer (will be used in gorelicFilter)
+    agent.CollectHTTPStat = true
+    agent.HTTPTimer = metrics.NewTimer()
+
+    agent.Run()
+  } else {
+    log.Print("!! Newrelic license missing from config file -> Not started")
+  }
+}
+
+// Filter to capture HTTP metrics for gorelic
+var gorelicFilter = func(c *revel.Controller, fc []revel.Filter) {
+  startTime := time.Now()
+  defer func() {
+    if agent != nil {
+      agent.HTTPTimer.UpdateSince(startTime)
+    }
+  }()
+  fc[0](c, fc[1:])
+}
+</code>
+

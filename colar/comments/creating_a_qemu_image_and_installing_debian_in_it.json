@@ -1,0 +1,19 @@
+{"author":"Guest",
+"title":"\"Business Card\" is no longer there!",
+"text":"Sorry, having found the Debian images, I found that the site no longer has the small image...\r\n",
+"ts":"2016-11-14T01:22:06.013-05:00 New_York",
+"date":"14 Nov 2016 1:22 EST"}
+{"author":"WebDawg@hackspherelabs.com",
+"title":"thanks",
+"text":"too many sites post so much text to explain so little.\r\n\r\nLike the format of this post.",
+"ts":"2016-08-06T21:11:50.368-04:00 New_York",
+"date":"06 Aug 2016 21:11 EDT"}
+{"author":"Ra\u00fal Salinas-Monteagudo",
+"title":"Using snapshots instead of copying the vanilla image",
+"text":"Actually you do not need to copy the image for later reuse. it is faster and more space-efficient to make a snapshot. \r\n\r\nhttp://wiki.qemu.org/Documentation/CreateSnapshot",
+"ts":"2015-03-04T07:56:18.648-05:00 New_York",
+"date":"04 Mar 2015 7:56 EST"}
+{"author":"Kit (Guest)",
+"title":"Good instruction",
+"text":"Keep it up. I enjoy working with your instruction....\n",
+"ts":"2011-06-15T19:58:00-07:00 Los_Angeles"}

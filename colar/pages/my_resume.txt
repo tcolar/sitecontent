@@ -1,0 +1,13 @@
+
+
+<html>
+  <script language="javascript">
+    document.location = 'http://www.status302.com/thibaut_colar_resume';
+  </script>
+</html>
+
+----
+
+ **[[http://www.status302.com/thibaut_colar_resume|My resume]] is now located [[http://www.status302.com/:thibaut_colar_resume|here]]**
+
+----
